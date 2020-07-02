@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Recipe</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous"
+          th:href="@{/webjars/bootstrap/3.4.1/css/bootstrap.min.css}">
+
+    <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+            integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+            crossorigin="anonymous" th:href="@{/webjars/bootstrap/3.4.1/js/bootstrap.min.js}"></script>
+</head>
+<body>
+<div class="container-fluid" style="margin-top: 20px">
+    <div class="row">
+        <div class="col-md-6 col-lg-offset-3">
+            <!--/*@thymesVar id="recipe" type="com.km.dto.RecipeDto"*/-->
+            <form method="post" th:object="${recipe}" th:action="@{/recipes/}">
+
+                <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                    <p>Please correct errors below</p>
+                </div>
+
+                <input type="hidden" th:field="*{id}"/>
+                <div class="panel-group">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h1 class="panel-title">Edit recipe information</h1>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-3 form-group" th:class="${#fields.hasErrors('description')}
+                                ? 'col-,d-3 form-group has-error' : 'col-md-3 form-group'">
+                                    <label>Recipe description:
+                                        <input type="text" class="form-control" th:field="*{description}"
+                                               th:errorClass="has-error"/>
+                                        <span class="help-block" th:if="${#fields.hasErrors('description')}">
+                                            <ul>
+                                                <li th:each="error : ${#fields.errors('description')}"
+                                                    th:text="${error}"/>
+                                            </ul>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 form-group">
+                                    <label>Categories:</label>
+                                </div>
+                                <div class="col-md-9 form-group">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="checkbox" value="">Cat 1
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 form-group" th:class="${#fields.hasErrors('prepTime')}
+                                ? 'col-,d-3 form-group has-error' : 'col-md-3 form-group'">
+                                    <label>Prep time:
+                                        <input type="text" class="form-control" th:field="*{prepTime}"
+                                               th:errorClass="has-error"/>
+                                        <span class="help-block" th:if="${#fields.hasErrors('prepTime')}">
+                                            <ul>
+                                                <li th:each="error : ${#fields.errors('prepTime')}"
+                                                    th:text="${error}"/>
+                                            </ul>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3 form-group" th:class="${#fields.hasErrors('cookTime')}
+                                ? 'col-,d-3 form-group has-error' : 'col-md-3 form-group'">
+                                    <label>Cook time:
+                                        <input type="text" class="form-control" th:field="*{cookTime}"
+                                               th:errorClass="has-error"/>
+                                        <span class="help-block" th:if="${#fields.hasErrors('cookTime')}">
+                                            <ul>
+                                                <li th:each="error : ${#fields.errors('cookTime')}"
+                                                    th:text="${error}"/>
+                                            </ul>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>Difficulty:
+                                        <select class="form-control" th:field="*{difficulty}">
+                                            <!-- T mark in th:each is the type of enum file -->
+                                            <option th:each="diffEach : ${T(com.km.model.Difficulty).values()}"
+                                                    th:value="${diffEach.name()}"
+                                                    th:text="${diffEach.name()}">
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 form-group" th:class="${#fields.hasErrors('servings')}
+                                ? 'col-,d-3 form-group has-error' : 'col-md-3 form-group'">
+                                    <label>Servings:
+                                        <input type="text" class="form-control" th:field="*{servings}" th:errorClass="has-error"/>
+                                        <span class="help-block" th:if="${#fields.hasErrors('servings')}">
+                                            <ul>
+                                                <li th:each="error : ${#fields.errors('servings')}"
+                                                    th:text="${error}"/>
+                                            </ul>
+                                        </span>
+                                    </label>
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>Source:
+                                        <input type="text" class="form-control" th:field="*{source}"/>
+                                    </label>
+                                </div>
+                                <div class="col-md-3 form-group" th:class="${#fields.hasErrors('url')}
+                                ? 'col-,d-3 form-group has-error' : 'col-md-3 form-group'">
+                                    <label>URL:
+                                        <input type="text" class="form-control" th:field="*{url}" th:if="${#fields.hasErrors('url')}"/>
+                                        <span class="help-block" th:if="${#fields.hasErrors('url')}">
+                                            <ul>
+                                                <li th:each="error : ${#fields.errors('url')}"
+                                                    th:text="${error}"/>
+                                            </ul>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-md-11">
+                                    <div class="panel-title">Ingredients</div>
+                                </div>
+                                <div class="col-md-1">
+                                    <a class="btn btn-default" href="#" role="button">Edit</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul>
+                                        <li th:each="ingredient : ${recipe.ingredients}"
+                                            th:text="${ingredient.amount
+                                         + ' ' + ingredient.unitOfMeasure.description
+                                          + ' - ' + ingredient.description}"></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">Direction</div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12 form-group">
+                                    <textarea class="form-group" rows="3" th:field="*{direction}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="panel-title">Note</div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12 form-group">
+                                    <textarea class="form-group" rows="3" th:field="*{note.recipeNote}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

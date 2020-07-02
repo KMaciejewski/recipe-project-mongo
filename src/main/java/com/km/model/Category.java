@@ -22,5 +22,7 @@ public class Category {
 
     private String id;
     private String description;
+
+    @Builder.Default
     private Set<Recipe> recipes = new HashSet<>();
 }

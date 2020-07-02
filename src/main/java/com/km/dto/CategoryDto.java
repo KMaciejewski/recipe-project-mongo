@@ -19,5 +19,7 @@ import java.util.Set;
 public class CategoryDto {
     private String id;
     private String description;
+
+    @Builder.Default
     private Set<RecipeDto> recipes = new HashSet<>();
 }

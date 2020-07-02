@@ -50,6 +50,10 @@ public class RecipeDto {
     private Difficulty difficulty;
     private Byte[] image;
     private NoteDto note;
+
+    @Builder.Default
     private Set<IngredientDto> ingredients = new HashSet<>();
+
+    @Builder.Default
     private Set<CategoryDto> categories = new HashSet<>();
 }

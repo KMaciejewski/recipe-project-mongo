@@ -6,11 +6,10 @@ import com.km.dto.IngredientDto;
 import com.km.model.Ingredient;
 import com.km.repository.IngredientRepository;
 import com.km.service.IngredientServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -18,15 +17,14 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class IngredientServiceImplTest {
 
-    private static final Long ONE = 1L, TWO = 2L;
+    private static final String ONE = "1", TWO = "2";
 
     @Mock
     private IngredientRepository ingredientRepository;
@@ -37,8 +35,16 @@ class IngredientServiceImplTest {
     @Mock
     private IngredientDtoToEntityConverter toEntityConverter;
 
-    @InjectMocks
     private IngredientServiceImpl ingredientService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        ingredientService = new IngredientServiceImpl(
+                ingredientRepository, toDtoConverter, toEntityConverter
+        );
+    }
 
     @Test
     void findAllByRecipeId() {
@@ -46,35 +52,35 @@ class IngredientServiceImplTest {
         ingredients.add(getIngredientEntity(ONE));
         ingredients.add(getIngredientEntity(TWO));
 
-        when(ingredientRepository.findAllByRecipeId(anyLong())).thenReturn(ingredients);
+        when(ingredientRepository.findAllByRecipeId(anyString())).thenReturn(ingredients);
         when(toDtoConverter.convert(any())).thenReturn(getIngredientDto(ONE), getIngredientDto(TWO));
 
         Set<IngredientDto> result = ingredientService.findAllByRecipeId(ONE);
 
-        verify(ingredientRepository).findAllByRecipeId(anyLong());
+        verify(ingredientRepository).findAllByRecipeId(anyString());
         verify(toDtoConverter, times(ingredients.size())).convert(any());
-        assertEquals(TWO, result.size());
+        assertEquals(2, result.size());
     }
 
     @Test
     void findByRecipeIdAndId() {
-        when(ingredientRepository.findByRecipeIdAndId(anyLong(), any()))
+        when(ingredientRepository.findByRecipeIdAndId(anyString(), any()))
                 .thenReturn(Optional.of(getIngredientEntity(ONE)));
         when(toDtoConverter.convert(any())).thenReturn(getIngredientDto(ONE));
 
         IngredientDto result = ingredientService.findByRecipeIdAndIngredientId(ONE, ONE);
 
-        verify(ingredientRepository).findByRecipeIdAndId(anyLong(), anyLong());
+        verify(ingredientRepository).findByRecipeIdAndId(anyString(), anyString());
         verify(toDtoConverter).convert(any());
         assertEquals(ONE, result.getId());
     }
 
-    private Ingredient getIngredientEntity(Long one) {
-        return Ingredient.builder().id(one).build();
+    private Ingredient getIngredientEntity(String id) {
+        return Ingredient.builder().id(id).build();
     }
 
-    private IngredientDto getIngredientDto(Long one) {
-        return IngredientDto.builder().id(one).build();
+    private IngredientDto getIngredientDto(String id) {
+        return IngredientDto.builder().id(id).build();
     }
 
     @Test
@@ -92,6 +98,6 @@ class IngredientServiceImplTest {
     void deleteById() {
         ingredientService.deleteById(ONE);
 
-        verify(ingredientRepository).deleteById(anyLong());
+        verify(ingredientRepository).deleteById(anyString());
     }
 }

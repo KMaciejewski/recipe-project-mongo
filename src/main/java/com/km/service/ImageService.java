@@ -6,9 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 
 public interface ImageService {
-    void save(Long id, MultipartFile image);
+    void save(String id, MultipartFile image);
 
-    RecipeDto findById(Long id);
+    RecipeDto findById(String id);
 
-    InputStream getImageInputStream(Long id);
+    InputStream getImageInputStream(String id);
 }

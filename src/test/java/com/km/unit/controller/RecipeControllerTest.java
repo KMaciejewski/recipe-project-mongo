@@ -9,39 +9,39 @@ import com.km.unit.utils.TestUtils;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-@ExtendWith(MockitoExtension.class)
 class RecipeControllerTest {
 
-    private static final Long ID = 1L;
+    private static final String ID = "1";
     private static final String BASE_URL = "/recipes/";
 
     @Mock
     private RecipeService recipeService;
 
-    @InjectMocks
     private RecipeController recipeController;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        recipeController = new RecipeController(recipeService);
+
         mockMvc = MockMvcBuilders.standaloneSetup(recipeController)
                 .setControllerAdvice(new ControllerExceptionHandler())
                 .build();
@@ -61,7 +61,7 @@ class RecipeControllerTest {
     @SneakyThrows
     @Test
     void showByIdNotFound() {
-        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
+        when(recipeService.findById(anyString())).thenThrow(NotFoundException.class);
 
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ID))
                 .andExpect(status().isNotFound())
@@ -72,9 +72,11 @@ class RecipeControllerTest {
     @SneakyThrows
     @Test
     void showByIdNumberFormatException() {
+        when(recipeService.findById(anyString())).thenThrow(NotFoundException.class);
+
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "abc"))
-                .andExpect(status().isBadRequest())
-                .andExpect(view().name("400error"))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("404error"))
                 .andExpect(model().attributeExists("exception"));
     }
 
@@ -93,7 +95,7 @@ class RecipeControllerTest {
         final RecipeDto dto = TestUtils.getById(RecipeDto.class, ID);
         when(recipeService.findById(ID)).thenReturn(dto);
 
-        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ID.toString() + "/update"))
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ID + "/update"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipes/form"))
                 .andExpect(model().attribute("recipe", dto));
@@ -102,13 +104,13 @@ class RecipeControllerTest {
     @SneakyThrows
     @Test
     void saveOrUpdate() {
-        RecipeDto dto = RecipeDto.builder().id(1L).build();
+        RecipeDto dto = RecipeDto.builder().id("1").build();
         when(recipeService.save(any())).thenReturn(dto);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post(BASE_URL)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("id", ID.toString())
+                        .param("id", ID)
                         .param("description", "Some description")
                         .param("direction", "some direction"))
                 .andExpect(status().is3xxRedirection())
@@ -118,7 +120,7 @@ class RecipeControllerTest {
     @Test
     public void saveOrUpdateValidationFail() throws Exception {
         RecipeDto dto = new RecipeDto();
-        dto.setId(2L);
+        dto.setId("2");
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post(BASE_URL)
@@ -135,6 +137,6 @@ class RecipeControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ID + "/delete"))
                 .andExpect(status().is3xxRedirection());
 
-        verify(recipeService).deleteById(anyLong());
+        verify(recipeService).deleteById(anyString());
     }
 }

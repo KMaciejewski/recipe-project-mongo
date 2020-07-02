@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 class IngredientDtoToEntityConverterTest {
@@ -38,13 +38,13 @@ class IngredientDtoToEntityConverterTest {
     @Test
     void convert() {
         IngredientDto dto = IngredientDto.builder()
-                .id(1L)
+                .id("1")
                 .description("Ingredient description")
                 .amount(new BigDecimal(100))
-                .recipeId(11L)
-                .unitOfMeasure(UnitOfMeasureDto.builder().id(1L).description("Some uom").build())
+                .recipeId("11")
+                .unitOfMeasure(UnitOfMeasureDto.builder().id("1").description("Some uom").build())
                 .build();
-        when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(Recipe.builder().id(11L).build()));
+        when(recipeRepository.findById(anyString())).thenReturn(Optional.of(Recipe.builder().id("11").build()));
 
         Ingredient result = converter.convert(dto);
 

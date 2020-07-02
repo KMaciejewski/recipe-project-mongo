@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDto {
-    private Long id;
+    private String id;
     private String description;
     private Set<RecipeDto> recipes = new HashSet<>();
 }

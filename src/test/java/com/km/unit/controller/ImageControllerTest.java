@@ -21,14 +21,17 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 class ImageControllerTest {
 
-    private static Long ONE = 1L;
+    private static String ONE = "1";
 
     @Mock
     private ImageService imageService;
@@ -51,9 +54,9 @@ class ImageControllerTest {
     @SneakyThrows
     @Test
     void getImageForm() {
-        when(imageService.findById(anyLong())).thenReturn(RecipeDto.builder().id(ONE).build());
+        when(imageService.findById(anyString())).thenReturn(RecipeDto.builder().id(ONE).build());
 
-        mockMvc.perform(get(TestUtils.buildUrl("recipe/", ONE.toString(), "/image-upload")))
+        mockMvc.perform(get(TestUtils.buildUrl("recipe/", ONE, "/image-upload")))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("recipe"))
                 .andExpect(view().name("recipes/image-upload-form"));
@@ -67,7 +70,7 @@ class ImageControllerTest {
         final MockMultipartFile image = new MockMultipartFile("image", "someFile.txt",
                 "text/plain", "Recipe Application".getBytes());
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart(TestUtils.buildUrl("recipe/", ONE.toString(), "/image")).file(image))
+        mockMvc.perform(MockMvcRequestBuilders.multipart(TestUtils.buildUrl("recipe/", ONE, "/image")).file(image))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/recipes/" + ONE))
                 .andExpect(view().name("redirect:/recipes/" + ONE));
@@ -81,10 +84,10 @@ class ImageControllerTest {
         String text = "Fetching image from database";
         final byte[] bytes = text.getBytes();
         final InputStream inputStream = new ByteArrayInputStream(bytes);
-        when(imageService.getImageInputStream(anyLong())).thenReturn(inputStream);
+        when(imageService.getImageInputStream(anyString())).thenReturn(inputStream);
 
         final MockHttpServletResponse response =
-                mockMvc.perform(get(TestUtils.buildUrl("recipe/", ONE.toString(), "/image")))
+                mockMvc.perform(get(TestUtils.buildUrl("recipe/", ONE, "/image")))
                         .andExpect(status().isOk())
                         .andReturn().getResponse();
 

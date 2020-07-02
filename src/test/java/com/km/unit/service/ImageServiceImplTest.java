@@ -5,23 +5,20 @@ import com.km.model.Recipe;
 import com.km.repository.RecipeRepository;
 import com.km.service.ImageServiceImpl;
 import lombok.SneakyThrows;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.InputStream;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 
-@ExtendWith(MockitoExtension.class)
 class ImageServiceImplTest {
 
     @Mock
@@ -34,6 +31,8 @@ class ImageServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.initMocks(this);
+
         imageService = new ImageServiceImpl(recipeRepository, toDtoConverter);
     }
 
@@ -41,20 +40,20 @@ class ImageServiceImplTest {
     void save() {
         final MockMultipartFile image = new MockMultipartFile("image", "someFile.txt",
                 "text/plain", "Recipe Application".getBytes());
-        Mockito.when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(Recipe.builder().id(1L).build()));
+        Mockito.when(recipeRepository.findById(anyString())).thenReturn(Optional.of(Recipe.builder().id("1").build()));
 
-        imageService.save(1L, image);
+        imageService.save("1", image);
 
-        Mockito.verify(recipeRepository).findById(anyLong());
+        Mockito.verify(recipeRepository).findById(anyString());
     }
 
     @Test
     void findById() {
-        Mockito.when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(Recipe.builder().build()));
+        Mockito.when(recipeRepository.findById(anyString())).thenReturn(Optional.of(Recipe.builder().build()));
 
-        imageService.findById(anyLong());
+        imageService.findById(anyString());
 
-        Mockito.verify(recipeRepository).findById(anyLong());
+        Mockito.verify(recipeRepository).findById(anyString());
         Mockito.verify(toDtoConverter).convert(any());
     }
 
@@ -62,9 +61,9 @@ class ImageServiceImplTest {
     @Test
     void getImageInputStream() {
         Byte[] bytes = new Byte[]{'1', '2', '3', '4'};
-        Mockito.when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(Recipe.builder().id(1L).image(bytes).build()));
+        Mockito.when(recipeRepository.findById(anyString())).thenReturn(Optional.of(Recipe.builder().id("1").image(bytes).build()));
 
-        final InputStream result = imageService.getImageInputStream(anyLong());
+        final InputStream result = imageService.getImageInputStream(anyString());
 
         Assertions.assertEquals(bytes.length, result.available());
     }

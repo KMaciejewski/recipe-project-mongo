@@ -26,7 +26,7 @@ public class IngredientEntityToDtoConverter implements Converter<Ingredient, Ing
                 .build();
     }
 
-    private Long getRecipeId(Recipe recipe) {
+    private String getRecipeId(Recipe recipe) {
         return Optional.ofNullable(recipe)
                 .map(Recipe::getId)
                 .orElse(null);

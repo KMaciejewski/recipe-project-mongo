@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CategoryTest {
 
-    Category category;
+    private Category category;
 
     @BeforeEach
     public void setUp() {
@@ -21,7 +21,7 @@ class CategoryTest {
 
     @Test
     void getId() {
-        Long id = 4L;
+        String id = "4";
 
         category.setId(id);
 

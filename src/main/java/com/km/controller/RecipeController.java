@@ -31,7 +31,7 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @GetMapping("{id}")
-    public String show(@PathVariable Long id, Model model) {
+    public String show(@PathVariable String id, Model model) {
         model.addAttribute("recipe", recipeService.findById(id));
         return "recipes/show";
     }
@@ -43,7 +43,7 @@ public class RecipeController {
     }
 
     @GetMapping("{id}/update")
-    public String update(@PathVariable Long id, Model model) {
+    public String update(@PathVariable String id, Model model) {
         model.addAttribute("recipe", recipeService.findById(id));
         return RECIPE_FORM_URL;
     }
@@ -65,7 +65,7 @@ public class RecipeController {
      HTML does not support PUT or DELETE http method.
      */
     @GetMapping("{id}/delete")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable String id) {
         recipeService.deleteById(id);
         return "redirect:/";
     }

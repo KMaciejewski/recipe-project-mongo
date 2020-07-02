@@ -20,7 +20,7 @@ class UomEntityToDtoConverterTest {
     @Test
     void convert() {
         UnitOfMeasure entity = UnitOfMeasure.builder()
-                .id(1L)
+                .id("1")
                 .description("Unit of measure description")
                 .build();
 

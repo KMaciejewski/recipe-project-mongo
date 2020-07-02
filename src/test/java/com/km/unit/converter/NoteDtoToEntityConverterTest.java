@@ -20,7 +20,7 @@ class NoteDtoToEntityConverterTest {
     @Test
     void convert() {
         NoteDto dto = NoteDto.builder()
-                .id(1L)
+                .id("1")
                 .recipeNote("Recipe note")
                 .build();
 

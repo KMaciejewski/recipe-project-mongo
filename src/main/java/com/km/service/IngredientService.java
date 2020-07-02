@@ -6,11 +6,11 @@ import java.util.Set;
 
 public interface IngredientService {
 
-    Set<IngredientDto> findAllByRecipeId(Long recipeId);
+    Set<IngredientDto> findAllByRecipeId(String recipeId);
 
-    IngredientDto findByRecipeIdAndIngredientId(Long recipeId, Long ingredientId);
+    IngredientDto findByRecipeIdAndIngredientId(String recipeId, String ingredientId);
 
     IngredientDto save(IngredientDto dto);
 
-    void deleteById(Long ingredientId);
+    void deleteById(String ingredientId);
 }

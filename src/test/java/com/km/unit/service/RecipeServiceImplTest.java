@@ -21,7 +21,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +40,7 @@ class RecipeServiceImplTest {
 
     private Set<Recipe> entities;
     private Set<RecipeDto> dtos;
-    private final Long ID = 1L;
+    private final String ID = "1";
 
     @BeforeEach
     void setUp() {
@@ -57,11 +57,11 @@ class RecipeServiceImplTest {
     @Test
     void findAll() {
         when(toDtoConverter.convert(any())).thenReturn(
-                TestUtils.getById(RecipeDto.class, 1L),
-                TestUtils.getById(RecipeDto.class, 2L),
-                TestUtils.getById(RecipeDto.class, 3L),
-                TestUtils.getById(RecipeDto.class, 4L),
-                TestUtils.getById(RecipeDto.class, 5L)
+                TestUtils.getById(RecipeDto.class, "1"),
+                TestUtils.getById(RecipeDto.class, "2"),
+                TestUtils.getById(RecipeDto.class, "3"),
+                TestUtils.getById(RecipeDto.class, "4"),
+                TestUtils.getById(RecipeDto.class, "5")
         );
 
         Set<RecipeDto> result = recipeService.findAll();
@@ -85,13 +85,13 @@ class RecipeServiceImplTest {
     @Test
     void findByIdNotFound() {
         assertThrows(NotFoundException.class,
-                () -> recipeService.findById(anyLong()), "Entity not found");
+                () -> recipeService.findById(anyString()), "Entity not found");
     }
 
     @Test
     void save() {
-        Recipe entity = Recipe.builder().id(1L).build();
-        RecipeDto dto = RecipeDto.builder().id(1L).build();
+        Recipe entity = Recipe.builder().id("1").build();
+        RecipeDto dto = RecipeDto.builder().id("1").build();
 
         when(toEntityConverter.convert(dto)).thenReturn(entity);
         when(recipeRepository.save(entity)).thenReturn(entity);
@@ -108,6 +108,6 @@ class RecipeServiceImplTest {
     void deleteById() {
         recipeService.deleteById(ID);
 
-        verify(recipeRepository).deleteById(anyLong());
+        verify(recipeRepository).deleteById(anyString());
     }
 }

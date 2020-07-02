@@ -39,8 +39,8 @@ class UnitOfMeasureServiceImplTest {
     @Test
     void findAll() {
         List<UnitOfMeasure> uomList = new ArrayList<>();
-        uomList.add(UnitOfMeasure.builder().id(1L).description("Teaspoon").build());
-        uomList.add(UnitOfMeasure.builder().id(2L).description("Cup").build());
+        uomList.add(UnitOfMeasure.builder().id("1").description("Teaspoon").build());
+        uomList.add(UnitOfMeasure.builder().id("2").description("Cup").build());
         when(unitOfMeasureRepository.findAll()).thenReturn(uomList);
 
         Set<UnitOfMeasureDto> result = unitOfMeasureService.findAll();

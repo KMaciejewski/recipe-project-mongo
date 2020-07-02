@@ -23,22 +23,22 @@ public class IngredientController {
     private final UnitOfMeasureService unitOfMeasureService;
 
     @GetMapping(BASE_URL)
-    public String findAllByRecipeId(@PathVariable Long recipeId, Model model) {
+    public String findAllByRecipeId(@PathVariable String recipeId, Model model) {
         model.addAttribute("ingredients", ingredientService.findAllByRecipeId(recipeId));
         model.addAttribute("recipeId", recipeId);
         return "ingredients/list";
     }
 
     @GetMapping(BASE_URL + "/{ingredientId}")
-    public String findAllByRecipeId(@PathVariable Long recipeId,
-                                    @PathVariable Long ingredientId, Model model) {
+    public String findAllByRecipeId(@PathVariable String recipeId,
+                                    @PathVariable String ingredientId, Model model) {
         model.addAttribute("ingredient",
                 ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
         return "ingredients/show";
     }
 
     @GetMapping(BASE_URL + "/{ingredientId}/update")
-    public String update(@PathVariable Long recipeId, @PathVariable Long ingredientId, Model model) {
+    public String update(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
         model.addAttribute("ingredient",
                 ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
         model.addAttribute("uomList", unitOfMeasureService.findAll());
@@ -52,7 +52,7 @@ public class IngredientController {
     }
 
     @GetMapping(BASE_URL + "/new")
-    public String create(@PathVariable Long recipeId, Model model) {
+    public String create(@PathVariable String recipeId, Model model) {
         final IngredientDto dtoWithRecipeId = IngredientDto.builder().recipeId(recipeId).build();
         model.addAttribute("ingredient", dtoWithRecipeId);
         model.addAttribute("uomList", unitOfMeasureService.findAll());
@@ -60,7 +60,7 @@ public class IngredientController {
     }
 
     @GetMapping(BASE_URL + "/{ingredientId}/delete")
-    public String delete(@PathVariable Long recipeId, @PathVariable Long ingredientId) {
+    public String delete(@PathVariable String recipeId, @PathVariable String ingredientId) {
         ingredientService.deleteById(ingredientId);
         return format("redirect:/recipe/%s/ingredients", recipeId);
     }

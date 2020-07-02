@@ -2,6 +2,7 @@ package com.km.service;
 
 import com.km.converter.RecipeEntityToDtoConverter;
 import com.km.dto.RecipeDto;
+import com.km.exception.NotFoundException;
 import com.km.model.Recipe;
 import com.km.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -24,7 +24,7 @@ public class ImageServiceImpl implements ImageService {
     @SneakyThrows
     @Override
     @Transactional
-    public void save(Long id, MultipartFile image) {
+    public void save(String id, MultipartFile image) {
         final Byte[] bytes = new Byte[image.getBytes().length];
         int i = 0;
         for (byte b : image.getBytes()) {
@@ -35,12 +35,12 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public RecipeDto findById(Long id) {
+    public RecipeDto findById(String id) {
         return toDtoConverter.convert(findEntityById(id));
     }
 
     @Override
-    public InputStream getImageInputStream(Long id) {
+    public InputStream getImageInputStream(String id) {
         final Recipe recipe = findEntityById(id);
 
         if (recipe.getImage() != null) {
@@ -54,8 +54,8 @@ public class ImageServiceImpl implements ImageService {
         return new ByteArrayInputStream(new byte[0]);
     }
 
-    private Recipe findEntityById(Long id) {
+    private Recipe findEntityById(String id) {
         return recipeRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Entity not found"));
+                .orElseThrow(() -> new NotFoundException("Entity not found"));
     }
 }

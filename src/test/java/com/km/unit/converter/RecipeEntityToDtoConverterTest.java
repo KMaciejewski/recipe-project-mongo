@@ -13,11 +13,10 @@ import com.km.model.Difficulty;
 import com.km.model.Ingredient;
 import com.km.model.Note;
 import com.km.model.Recipe;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class RecipeEntityToDtoConverterTest {
 
     @Mock
@@ -38,32 +36,42 @@ class RecipeEntityToDtoConverterTest {
     @Mock
     private CategoryEntityToDtoConverter categoryEntityToDtoConverter;
 
-    @InjectMocks
     private RecipeEntityToDtoConverter converter;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        converter = new RecipeEntityToDtoConverter(
+                noteEntityToDtoConverter,
+                ingredientEntityToDtoConverter,
+                categoryEntityToDtoConverter
+        );
+    }
 
     @Test
     void convert() {
         //given
         Set<Ingredient> ingredients = new HashSet<>();
-        ingredients.add(Ingredient.builder().id(1L).description("First ingredient").build());
-        ingredients.add(Ingredient.builder().id(2L).description("Second ingredient").build());
+        ingredients.add(Ingredient.builder().id("1").description("First ingredient").build());
+        ingredients.add(Ingredient.builder().id("2").description("Second ingredient").build());
         when(ingredientEntityToDtoConverter.convert(any())).thenReturn(
-                IngredientDto.builder().id(1L).build(),
-                IngredientDto.builder().id(2L).build()
+                IngredientDto.builder().id("1").build(),
+                IngredientDto.builder().id("2").build()
         );
 
         Set<Category> categories = new HashSet<>();
-        categories.add(Category.builder().id(1L).description("First category").build());
-        categories.add(Category.builder().id(2L).description("Second category").build());
+        categories.add(Category.builder().id("1").description("First category").build());
+        categories.add(Category.builder().id("2").description("Second category").build());
         when(categoryEntityToDtoConverter.convert(any())).thenReturn(
-                CategoryDto.builder().id(1L).description("First category").build(),
-                CategoryDto.builder().id(2L).description("Second category").build()
+                CategoryDto.builder().id("1").description("First category").build(),
+                CategoryDto.builder().id("2").description("Second category").build()
         );
 
-        when(noteEntityToDtoConverter.convert(any())).thenReturn(NoteDto.builder().id(1L).recipeNote("Recipe note").build());
+        when(noteEntityToDtoConverter.convert(any())).thenReturn(NoteDto.builder().id("1").recipeNote("Recipe note").build());
 
         Recipe entity = Recipe.builder()
-                .id(1L)
+                .id("1")
                 .description("Recipe description")
                 .prepTime(10)
                 .cookTime(5)
@@ -73,7 +81,7 @@ class RecipeEntityToDtoConverterTest {
                 .direction("Test direction")
                 .difficulty(Difficulty.EASY)
                 .image(new Byte[100])
-                .note(Note.builder().id(1L).recipeNote("Recipe note").build())
+                .note(Note.builder().id("1").recipeNote("Recipe note").build())
                 .ingredients(ingredients)
                 .categories(categories)
                 .build();

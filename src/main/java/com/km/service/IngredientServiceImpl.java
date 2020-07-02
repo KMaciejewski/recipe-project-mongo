@@ -21,7 +21,7 @@ public class IngredientServiceImpl implements IngredientService {
     private final IngredientDtoToEntityConverter toEntityConverter;
 
     @Override
-    public Set<IngredientDto> findAllByRecipeId(Long recipeId) {
+    public Set<IngredientDto> findAllByRecipeId(String recipeId) {
         return ingredientRepository.findAllByRecipeId(recipeId)
                 .stream()
                 .map(toDtoConverter::convert)
@@ -29,7 +29,7 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public IngredientDto findByRecipeIdAndIngredientId(Long recipeId, Long ingredientId) {
+    public IngredientDto findByRecipeIdAndIngredientId(String recipeId, String ingredientId) {
         return ingredientRepository.findByRecipeIdAndId(recipeId, ingredientId)
                 .map(toDtoConverter::convert)
                 .orElse(null);
@@ -42,7 +42,7 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     @Override
-    public void deleteById(Long ingredientId) {
+    public void deleteById(String ingredientId) {
         ingredientRepository.deleteById(ingredientId);
     }
 }

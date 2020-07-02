@@ -1,10 +1,10 @@
 package com.km.unit.utils;
 
 import com.km.dto.RecipeDto;
+import com.km.exception.NotFoundException;
 import com.km.model.Recipe;
 import lombok.SneakyThrows;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +20,7 @@ public class TestUtils {
                 .collect(Collectors.joining());
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
     public static <T> Set<T> getRecipes(Class<T> clazz) {
         final long amount = 5L;
@@ -28,21 +29,22 @@ public class TestUtils {
         LongStream.rangeClosed(1, amount)
                 .forEach(value -> {
                             if (instance instanceof Recipe) {
-                                recipes.add((T) getRecipeEntity(value));
+                                recipes.add((T) getRecipeEntity(String.valueOf(value)));
                             }
 
                             if (instance instanceof RecipeDto) {
-                                recipes.add((T) getRecipeDto(value));
+                                recipes.add((T) getRecipeDto(String.valueOf(value)));
                             }
                         }
                 );
         return recipes;
     }
 
+    @SuppressWarnings("unchecked")
     @SneakyThrows
-    public static <T> T getById(Class<T> clazz, Long id) {
+    public static <T> T getById(Class<T> clazz, String id) {
         final T instance = clazz.newInstance();
-        final Supplier<EntityNotFoundException> notFoundSupplier = () -> new EntityNotFoundException("Recipe not found");
+        final Supplier<NotFoundException> notFoundSupplier = () -> new NotFoundException("Recipe not found");
         if (instance instanceof Recipe) {
             return (T) getRecipes(Recipe.class)
                     .stream()
@@ -61,19 +63,17 @@ public class TestUtils {
         return null;
     }
 
-    private static Recipe getRecipeEntity(Long id) {
+    private static Recipe getRecipeEntity(String id) {
         return Recipe.builder()
                 .id(id)
-                .description(String.format("Recipe entity %d", id))
+                .description(String.format("Recipe entity %s", id))
                 .build();
     }
 
-    private static RecipeDto getRecipeDto(Long id) {
+    private static RecipeDto getRecipeDto(String id) {
         return RecipeDto.builder()
                 .id(id)
-                .description(String.format("Recipe dto %d", id))
+                .description(String.format("Recipe dto %s", id))
                 .build();
     }
-
-
 }

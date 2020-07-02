@@ -28,7 +28,7 @@ public class IngredientDtoToEntityConverter implements Converter<IngredientDto, 
                 .build();
     }
 
-    private Recipe getRecipe(Long recipeId) {
+    private Recipe getRecipe(String recipeId) {
         return Optional.ofNullable(recipeId)
                 .flatMap(id -> recipeRepository.findById(id))
                 .orElse(null);

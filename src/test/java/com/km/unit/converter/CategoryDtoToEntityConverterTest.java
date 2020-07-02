@@ -20,7 +20,7 @@ class CategoryDtoToEntityConverterTest {
     @Test
     void convert() {
         CategoryDto dto = CategoryDto.builder()
-                .id(1L)
+                .id("1")
                 .description("Category description")
                 .build();
 

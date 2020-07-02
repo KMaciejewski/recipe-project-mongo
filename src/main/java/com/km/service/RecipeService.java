@@ -8,9 +8,9 @@ public interface RecipeService {
 
     Set<RecipeDto> findAll();
 
-    RecipeDto findById(Long id);
+    RecipeDto findById(String id);
 
     RecipeDto save(RecipeDto dto);
 
-    void deleteById(Long id);
+    void deleteById(String id);
 }

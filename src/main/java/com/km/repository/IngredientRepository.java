@@ -6,9 +6,9 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 import java.util.Set;
 
-public interface IngredientRepository extends CrudRepository<Ingredient, Long> {
+public interface IngredientRepository extends CrudRepository<Ingredient, String> {
 
-    Set<Ingredient> findAllByRecipeId(Long recipeId);
+    Set<Ingredient> findAllByRecipeId(String recipeId);
 
-    Optional<Ingredient> findByRecipeIdAndId(Long recipeId, Long ingredientId);
+    Optional<Ingredient> findByRecipeIdAndId(String recipeId, String ingredientId);
 }

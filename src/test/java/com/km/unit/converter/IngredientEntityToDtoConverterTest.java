@@ -6,11 +6,11 @@ import com.km.dto.IngredientDto;
 import com.km.dto.UnitOfMeasureDto;
 import com.km.model.Ingredient;
 import com.km.model.UnitOfMeasure;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 
@@ -18,24 +18,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class IngredientEntityToDtoConverterTest {
 
     @Mock
     private UomEntityToDtoConverter uomEntityToDtoConverter;
 
-    @InjectMocks
     private IngredientEntityToDtoConverter converter;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+
+        converter = new IngredientEntityToDtoConverter(uomEntityToDtoConverter);
+    }
 
     @Test
     void convert() {
         Ingredient entity = Ingredient.builder()
-                .id(1L)
+                .id("1")
                 .description("Ingredient description")
                 .amount(new BigDecimal(100))
-                .unitOfMeasure(UnitOfMeasure.builder().id(1L).build())
+                .unitOfMeasure(UnitOfMeasure.builder().id("1").build())
                 .build();
-        when(uomEntityToDtoConverter.convert(any())).thenReturn(UnitOfMeasureDto.builder().id(1L).build());
+        when(uomEntityToDtoConverter.convert(any())).thenReturn(UnitOfMeasureDto.builder().id("1").build());
 
         IngredientDto result = converter.convert(entity);
 

@@ -14,6 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnitOfMeasureDto {
-    private Long id;
+    private String id;
     private String description;
 }

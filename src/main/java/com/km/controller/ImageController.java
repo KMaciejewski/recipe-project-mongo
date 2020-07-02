@@ -21,20 +21,20 @@ public class ImageController {
     private final ImageService imageService;
 
     @GetMapping("recipe/{id}/image-upload")
-    public String getImageForm(@PathVariable Long id, Model model) {
+    public String getImageForm(@PathVariable String id, Model model) {
         model.addAttribute("recipe", imageService.findById(id));
         return "recipes/image-upload-form";
     }
 
     @PostMapping("recipe/{id}/image")
-    public String saveImage(@PathVariable Long id, @RequestParam MultipartFile image) {
+    public String saveImage(@PathVariable String id, @RequestParam MultipartFile image) {
         imageService.save(id, image);
         return String.format("redirect:/recipes/%s", id);
     }
 
     @SneakyThrows
     @GetMapping("recipe/{id}/image")
-    public void getImageFromDB(@PathVariable Long id, HttpServletResponse response) {
+    public void getImageFromDB(@PathVariable String id, HttpServletResponse response) {
         response.setContentType("image/jpeg");
         IOUtils.copy(imageService.getImageInputStream(id), response.getOutputStream());
     }

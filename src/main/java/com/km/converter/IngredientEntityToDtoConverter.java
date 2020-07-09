@@ -21,7 +21,7 @@ public class IngredientEntityToDtoConverter implements Converter<Ingredient, Ing
                 .id(source.getId())
                 .description(source.getDescription())
                 .amount(source.getAmount())
-                .recipeId(getRecipeId(source.getRecipe()))
+//                .recipeId(getRecipeId(source.getRecipe()))
                 .unitOfMeasure(uomEntityToDtoConverter.convert(source.getUnitOfMeasure()))
                 .build();
     }

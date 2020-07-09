@@ -7,17 +7,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
-@ToString(exclude = "recipe")
-@EqualsAndHashCode(exclude = "recipe")
+@ToString
+@EqualsAndHashCode
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Note {
 
+    @Id
     private String id;
-    private Recipe recipe;
     private String recipeNote;
 }

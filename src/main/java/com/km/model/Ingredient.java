@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Document
 public class Ingredient {
 
     @Id
@@ -28,6 +30,9 @@ public class Ingredient {
 
     @DBRef
     private UnitOfMeasure unitOfMeasure;
+
+    @DBRef
+    private Recipe recipe;
 
     public Ingredient(String description, BigDecimal amount, UnitOfMeasure unitOfMeasure) {
         this.description = description;

@@ -11,4 +11,6 @@ public interface IngredientRepository extends CrudRepository<Ingredient, String>
     Set<Ingredient> findAllByRecipeId(String recipeId);
 
     Optional<Ingredient> findByRecipeIdAndId(String recipeId, String ingredientId);
+
+    Optional<Ingredient> findByDescription(String description);
 }

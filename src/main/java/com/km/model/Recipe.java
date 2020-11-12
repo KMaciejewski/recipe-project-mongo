@@ -37,7 +37,6 @@ public class Recipe {
     private Byte[] image;
     private Note note;
 
-    @DBRef
     @Builder.Default
     private Set<Ingredient> ingredients = new HashSet<>();
 

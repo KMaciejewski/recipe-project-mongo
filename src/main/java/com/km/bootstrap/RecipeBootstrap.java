@@ -1,12 +1,8 @@
 package com.km.bootstrap;
 
-import com.km.model.Category;
-import com.km.model.Difficulty;
-import com.km.model.Ingredient;
-import com.km.model.Note;
-import com.km.model.Recipe;
-import com.km.model.UnitOfMeasure;
+import com.km.model.*;
 import com.km.repository.CategoryRepository;
+import com.km.repository.IngredientRepository;
 import com.km.repository.RecipeRepository;
 import com.km.repository.UnitOfMeasureRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,84 +23,137 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
     private final CategoryRepository categoryRepository;
     private final RecipeRepository recipeRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
+    private final IngredientRepository ingredientRepository;
 
-    public RecipeBootstrap(CategoryRepository categoryRepository, RecipeRepository recipeRepository, UnitOfMeasureRepository unitOfMeasureRepository) {
+    public RecipeBootstrap(CategoryRepository categoryRepository, RecipeRepository recipeRepository,
+                           UnitOfMeasureRepository unitOfMeasureRepository, IngredientRepository ingredientRepository) {
         this.categoryRepository = categoryRepository;
         this.recipeRepository = recipeRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
+        this.ingredientRepository = ingredientRepository;
     }
 
     @Override
     @Transactional // to avoid LazyInitializationException in Category entity for recipes field
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        loadCategories();
+        loadUom();
+        loadIngredients();
         recipeRepository.saveAll(getRecipes());
         log.debug("Loading bootstrap data");
+    }
+
+    private void loadCategories() {
+        Category cat1 = new Category();
+        cat1.setDescription("American");
+        categoryRepository.save(cat1);
+
+        Category cat2 = new Category();
+        cat2.setDescription("Italian");
+        categoryRepository.save(cat2);
+
+        Category cat3 = new Category();
+        cat3.setDescription("Mexican");
+        categoryRepository.save(cat3);
+
+        Category cat4 = new Category();
+        cat4.setDescription("Fast Food");
+        categoryRepository.save(cat4);
+    }
+
+    private void loadUom() {
+        UnitOfMeasure uom1 = new UnitOfMeasure();
+        uom1.setDescription("Teaspoon");
+        unitOfMeasureRepository.save(uom1);
+
+        UnitOfMeasure uom2 = new UnitOfMeasure();
+        uom2.setDescription("Tablespoon");
+        unitOfMeasureRepository.save(uom2);
+
+        UnitOfMeasure uom3 = new UnitOfMeasure();
+        uom3.setDescription("Cup");
+        unitOfMeasureRepository.save(uom3);
+
+        UnitOfMeasure uom4 = new UnitOfMeasure();
+        uom4.setDescription("Pinch");
+        unitOfMeasureRepository.save(uom4);
+
+        UnitOfMeasure uom5 = new UnitOfMeasure();
+        uom5.setDescription("Ounce");
+        unitOfMeasureRepository.save(uom5);
+
+        UnitOfMeasure uom6 = new UnitOfMeasure();
+        uom6.setDescription("Each");
+        unitOfMeasureRepository.save(uom6);
+
+        UnitOfMeasure uom7 = new UnitOfMeasure();
+        uom7.setDescription("Pint");
+        unitOfMeasureRepository.save(uom7);
+
+        UnitOfMeasure uom8 = new UnitOfMeasure();
+        uom8.setDescription("Dash");
+        unitOfMeasureRepository.save(uom8);
+    }
+
+    private void loadIngredients() {
+        //get UOMs
+        Optional<UnitOfMeasure> eachUomOptional = unitOfMeasureRepository.findByDescription("Each");
+        Optional<UnitOfMeasure> tableSpoonUomOptional = unitOfMeasureRepository.findByDescription("Tablespoon");
+        Optional<UnitOfMeasure> teaSpoonUomOptional = unitOfMeasureRepository.findByDescription("Teaspoon");
+        Optional<UnitOfMeasure> dashUomOptional = unitOfMeasureRepository.findByDescription("Dash");
+        Optional<UnitOfMeasure> pintUomOptional = unitOfMeasureRepository.findByDescription("Pint");
+        Optional<UnitOfMeasure> cupsUomOptional = unitOfMeasureRepository.findByDescription("Cup");
+
+        //get optionals
+        UnitOfMeasure eachUom = eachUomOptional.orElseThrow(() -> new RuntimeException("Expected UOM Not Found"));
+        UnitOfMeasure tableSpoonUom = tableSpoonUomOptional.orElseThrow(() -> new RuntimeException("Expected UOM Not Found"));
+        UnitOfMeasure teapoonUom = tableSpoonUomOptional.orElseThrow(() -> new RuntimeException("Expected UOM Not Found"));
+        UnitOfMeasure dashUom = dashUomOptional.orElseThrow(() -> new RuntimeException("Expected UOM Not Found"));
+        UnitOfMeasure pintUom = pintUomOptional.orElseThrow(() -> new RuntimeException("Expected UOM Not Found"));
+        UnitOfMeasure cupsUom = cupsUomOptional.orElseThrow(() -> new RuntimeException("Expected UOM Not Found"));
+
+        // guacRecipe ingredients
+        ingredientRepository.save(new Ingredient("ripe avocados", new BigDecimal(2), eachUom));
+        ingredientRepository.save(new Ingredient("Kosher salt", new BigDecimal(".5"), teapoonUom));
+        ingredientRepository.save(new Ingredient("fresh lime juice or lemon juice", new BigDecimal(2), tableSpoonUom));
+        ingredientRepository.save(new Ingredient("minced red onion or thinly sliced green onion", new BigDecimal(2), tableSpoonUom));
+        ingredientRepository.save(new Ingredient("serrano chiles, stems and seeds removed, minced", new BigDecimal(2), eachUom));
+        ingredientRepository.save(new Ingredient("Cilantro", new BigDecimal(2), tableSpoonUom));
+        ingredientRepository.save(new Ingredient("freshly grated black pepper", new BigDecimal(2), dashUom));
+        ingredientRepository.save(new Ingredient("ripe tomato, seeds and pulp removed, chopped", new BigDecimal(".5"), eachUom));
+
+        // tacosRecipe ingredients
+        ingredientRepository.save(new Ingredient("Ancho Chili Powder", new BigDecimal(2), tableSpoonUom));
+        ingredientRepository.save(new Ingredient("Dried Oregano", new BigDecimal(1), teapoonUom));
+        ingredientRepository.save(new Ingredient("Dried Cumin", new BigDecimal(1), teapoonUom));
+        ingredientRepository.save(new Ingredient("Sugar", new BigDecimal(1), teapoonUom));
+        ingredientRepository.save(new Ingredient("Salt", new BigDecimal(".5"), teapoonUom));
+        ingredientRepository.save(new Ingredient("Clove of Garlic, Choppedr", new BigDecimal(1), eachUom));
+        ingredientRepository.save(new Ingredient("finely grated orange zestr", new BigDecimal(1), tableSpoonUom));
+        ingredientRepository.save(new Ingredient("fresh-squeezed orange juice", new BigDecimal(3), tableSpoonUom));
+        ingredientRepository.save(new Ingredient("Olive Oil", new BigDecimal(2), tableSpoonUom));
+        ingredientRepository.save(new Ingredient("boneless chicken thighs", new BigDecimal(4), tableSpoonUom));
+        ingredientRepository.save(new Ingredient("small corn tortillasr", new BigDecimal(8), eachUom));
+        ingredientRepository.save(new Ingredient("packed baby arugula", new BigDecimal(3), cupsUom));
+        ingredientRepository.save(new Ingredient("medium ripe avocados, slic", new BigDecimal(2), eachUom));
+        ingredientRepository.save(new Ingredient("radishes, thinly sliced", new BigDecimal(4), eachUom));
+        ingredientRepository.save(new Ingredient("cherry tomatoes, halved", new BigDecimal(".5"), pintUom));
+        ingredientRepository.save(new Ingredient("red onion, thinly sliced", new BigDecimal(".25"), eachUom));
+        ingredientRepository.save(new Ingredient("Roughly chopped cilantro", new BigDecimal(4), eachUom));
+        ingredientRepository.save(new Ingredient("cup sour cream thinned with 1/4 cup milk", new BigDecimal(4), cupsUom));
+        ingredientRepository.save(new Ingredient("lime, cut into wedges", new BigDecimal(4), eachUom));
     }
 
     private List<Recipe> getRecipes() {
 
         List<Recipe> recipes = new ArrayList<>(2);
 
-        //get UOMs
-        Optional<UnitOfMeasure> eachUomOptional = unitOfMeasureRepository.findByDescription("Each");
-
-        if (!eachUomOptional.isPresent()) {
-            throw new RuntimeException("Expected UOM Not Found");
-        }
-
-        Optional<UnitOfMeasure> tableSpoonUomOptional = unitOfMeasureRepository.findByDescription("Tablespoon");
-
-        if (!tableSpoonUomOptional.isPresent()) {
-            throw new RuntimeException("Expected UOM Not Found");
-        }
-
-        Optional<UnitOfMeasure> teaSpoonUomOptional = unitOfMeasureRepository.findByDescription("Teaspoon");
-
-        if (!teaSpoonUomOptional.isPresent()) {
-            throw new RuntimeException("Expected UOM Not Found");
-        }
-
-        Optional<UnitOfMeasure> dashUomOptional = unitOfMeasureRepository.findByDescription("Dash");
-
-        if (!dashUomOptional.isPresent()) {
-            throw new RuntimeException("Expected UOM Not Found");
-        }
-
-        Optional<UnitOfMeasure> pintUomOptional = unitOfMeasureRepository.findByDescription("Pint");
-
-        if (!pintUomOptional.isPresent()) {
-            throw new RuntimeException("Expected UOM Not Found");
-        }
-
-        Optional<UnitOfMeasure> cupsUomOptional = unitOfMeasureRepository.findByDescription("Cup");
-
-        if (!cupsUomOptional.isPresent()) {
-            throw new RuntimeException("Expected UOM Not Found");
-        }
-
-        //get optionals
-        UnitOfMeasure eachUom = eachUomOptional.get();
-        UnitOfMeasure tableSpoonUom = tableSpoonUomOptional.get();
-        UnitOfMeasure teapoonUom = tableSpoonUomOptional.get();
-        UnitOfMeasure dashUom = dashUomOptional.get();
-        UnitOfMeasure pintUom = pintUomOptional.get();
-        UnitOfMeasure cupsUom = cupsUomOptional.get();
-
         //get Categories
         Optional<Category> americanCategoryOptional = categoryRepository.findByDescription("American");
-
-        if (!americanCategoryOptional.isPresent()) {
-            throw new RuntimeException("Expected Category Not Found");
-        }
-
         Optional<Category> mexicanCategoryOptional = categoryRepository.findByDescription("Mexican");
 
-        if (!mexicanCategoryOptional.isPresent()) {
-            throw new RuntimeException("Expected Category Not Found");
-        }
-
-        Category americanCategory = americanCategoryOptional.get();
-        Category mexicanCategory = mexicanCategoryOptional.get();
+        Category americanCategory = americanCategoryOptional.orElseThrow(() -> new RuntimeException("Expected Category Not Found"));
+        Category mexicanCategory = mexicanCategoryOptional.orElseThrow(() -> new RuntimeException("Expected Category Not Found"));
 
         //Yummy Guac
         Recipe guacRecipe = new Recipe();
@@ -136,14 +185,14 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
         guacRecipe.setNote(guacNotes);
 
-        guacRecipe.addIngredient(new Ingredient("ripe avocados", new BigDecimal(2), eachUom));
-        guacRecipe.addIngredient(new Ingredient("Kosher salt", new BigDecimal(".5"), teapoonUom));
-        guacRecipe.addIngredient(new Ingredient("fresh lime juice or lemon juice", new BigDecimal(2), tableSpoonUom));
-        guacRecipe.addIngredient(new Ingredient("minced red onion or thinly sliced green onion", new BigDecimal(2), tableSpoonUom));
-        guacRecipe.addIngredient(new Ingredient("serrano chiles, stems and seeds removed, minced", new BigDecimal(2), eachUom));
-        guacRecipe.addIngredient(new Ingredient("Cilantro", new BigDecimal(2), tableSpoonUom));
-        guacRecipe.addIngredient(new Ingredient("freshly grated black pepper", new BigDecimal(2), dashUom));
-        guacRecipe.addIngredient(new Ingredient("ripe tomato, seeds and pulp removed, chopped", new BigDecimal(".5"), eachUom));
+        addIngredientByDescription(guacRecipe, "ripe avocados");
+        addIngredientByDescription(guacRecipe, "Kosher salt");
+        addIngredientByDescription(guacRecipe, "fresh lime juice or lemon juice");
+        addIngredientByDescription(guacRecipe, "minced red onion or thinly sliced green onion");
+        addIngredientByDescription(guacRecipe, "serrano chiles, stems and seeds removed, minced");
+        addIngredientByDescription(guacRecipe, "Cilantro");
+        addIngredientByDescription(guacRecipe, "freshly grated black pepper");
+        addIngredientByDescription(guacRecipe, "ripe tomato, seeds and pulp removed, chopped");
 
         guacRecipe.getCategories().add(americanCategory);
         guacRecipe.getCategories().add(mexicanCategory);
@@ -187,30 +236,34 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
         tacosRecipe.setNote(tacoNotes);
 
-        tacosRecipe.addIngredient(new Ingredient("Ancho Chili Powder", new BigDecimal(2), tableSpoonUom));
-        tacosRecipe.addIngredient(new Ingredient("Dried Oregano", new BigDecimal(1), teapoonUom));
-        tacosRecipe.addIngredient(new Ingredient("Dried Cumin", new BigDecimal(1), teapoonUom));
-        tacosRecipe.addIngredient(new Ingredient("Sugar", new BigDecimal(1), teapoonUom));
-        tacosRecipe.addIngredient(new Ingredient("Salt", new BigDecimal(".5"), teapoonUom));
-        tacosRecipe.addIngredient(new Ingredient("Clove of Garlic, Choppedr", new BigDecimal(1), eachUom));
-        tacosRecipe.addIngredient(new Ingredient("finely grated orange zestr", new BigDecimal(1), tableSpoonUom));
-        tacosRecipe.addIngredient(new Ingredient("fresh-squeezed orange juice", new BigDecimal(3), tableSpoonUom));
-        tacosRecipe.addIngredient(new Ingredient("Olive Oil", new BigDecimal(2), tableSpoonUom));
-        tacosRecipe.addIngredient(new Ingredient("boneless chicken thighs", new BigDecimal(4), tableSpoonUom));
-        tacosRecipe.addIngredient(new Ingredient("small corn tortillasr", new BigDecimal(8), eachUom));
-        tacosRecipe.addIngredient(new Ingredient("packed baby arugula", new BigDecimal(3), cupsUom));
-        tacosRecipe.addIngredient(new Ingredient("medium ripe avocados, slic", new BigDecimal(2), eachUom));
-        tacosRecipe.addIngredient(new Ingredient("radishes, thinly sliced", new BigDecimal(4), eachUom));
-        tacosRecipe.addIngredient(new Ingredient("cherry tomatoes, halved", new BigDecimal(".5"), pintUom));
-        tacosRecipe.addIngredient(new Ingredient("red onion, thinly sliced", new BigDecimal(".25"), eachUom));
-        tacosRecipe.addIngredient(new Ingredient("Roughly chopped cilantro", new BigDecimal(4), eachUom));
-        tacosRecipe.addIngredient(new Ingredient("cup sour cream thinned with 1/4 cup milk", new BigDecimal(4), cupsUom));
-        tacosRecipe.addIngredient(new Ingredient("lime, cut into wedges", new BigDecimal(4), eachUom));
+        addIngredientByDescription(tacosRecipe, "Ancho Chili Powder");
+        addIngredientByDescription(tacosRecipe, "Dried Oregano");
+        addIngredientByDescription(tacosRecipe, "Dried Cumin");
+        addIngredientByDescription(tacosRecipe, "Sugar");
+        addIngredientByDescription(tacosRecipe, "Salt");
+        addIngredientByDescription(tacosRecipe, "Clove of Garlic, Choppedr");
+        addIngredientByDescription(tacosRecipe, "finely grated orange zestr");
+        addIngredientByDescription(tacosRecipe, "fresh-squeezed orange juice");
+        addIngredientByDescription(tacosRecipe, "Olive Oil");
+        addIngredientByDescription(tacosRecipe, "boneless chicken thighs");
+        addIngredientByDescription(tacosRecipe, "small corn tortillasr");
+        addIngredientByDescription(tacosRecipe, "packed baby arugula");
+        addIngredientByDescription(tacosRecipe, "medium ripe avocados, slic");
+        addIngredientByDescription(tacosRecipe, "radishes, thinly sliced");
+        addIngredientByDescription(tacosRecipe, "cherry tomatoes, halved");
+        addIngredientByDescription(tacosRecipe, "red onion, thinly sliced");
+        addIngredientByDescription(tacosRecipe, "Roughly chopped cilantro");
+        addIngredientByDescription(tacosRecipe, "cup sour cream thinned with 1/4 cup milk");
+        addIngredientByDescription(tacosRecipe, "lime, cut into wedges");
 
         tacosRecipe.getCategories().add(americanCategory);
         tacosRecipe.getCategories().add(mexicanCategory);
 
         recipes.add(tacosRecipe);
         return recipes;
+    }
+
+    private void addIngredientByDescription(Recipe recipe, String description) {
+        ingredientRepository.findByDescription(description).ifPresent(ingredient -> recipe.addIngredient(ingredient));
     }
 }

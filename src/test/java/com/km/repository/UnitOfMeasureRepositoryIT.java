@@ -33,6 +33,10 @@ class UnitOfMeasureRepositoryIT {
 
     @BeforeEach
     void setUp() {
+        recipeRepository.deleteAll();
+        unitOfMeasureRepository.deleteAll();
+        categoryRepository.deleteAll();
+
         recipeBootstrap = new RecipeBootstrap(categoryRepository, recipeRepository, unitOfMeasureRepository, ingredientRepository);
         recipeBootstrap.onApplicationEvent(null);
     }

@@ -1,9 +1,8 @@
 package com.km.service;
 
 import com.km.dto.UnitOfMeasureDto;
-
-import java.util.Set;
+import reactor.core.publisher.Flux;
 
 public interface UnitOfMeasureService {
-    Set<UnitOfMeasureDto> findAll();
+    Flux<UnitOfMeasureDto> findAll();
 }

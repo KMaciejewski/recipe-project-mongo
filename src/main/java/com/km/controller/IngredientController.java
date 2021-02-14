@@ -24,7 +24,7 @@ public class IngredientController {
 
     @GetMapping(BASE_URL)
     public String findAllByRecipeId(@PathVariable String recipeId, Model model) {
-        model.addAttribute("ingredients", ingredientService.findAllByRecipeId(recipeId));
+        model.addAttribute("ingredients", ingredientService.findAllByRecipeId(recipeId).collectList().block());
         model.addAttribute("recipeId", recipeId);
         return "ingredients/list";
     }
@@ -33,21 +33,21 @@ public class IngredientController {
     public String findAllByRecipeId(@PathVariable String recipeId,
                                     @PathVariable String ingredientId, Model model) {
         model.addAttribute("ingredient",
-                ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
+                ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId).block());
         return "ingredients/show";
     }
 
     @GetMapping(BASE_URL + "/{ingredientId}/update")
     public String update(@PathVariable String recipeId, @PathVariable String ingredientId, Model model) {
         model.addAttribute("ingredient",
-                ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
-        model.addAttribute("uomList", unitOfMeasureService.findAll());
+                ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId).block());
+        model.addAttribute("uomList", unitOfMeasureService.findAll().collectList().block());
         return "ingredients/form";
     }
 
     @PostMapping(BASE_URL)
     public String saveOrUpdate(@ModelAttribute IngredientDto dto) {
-        IngredientDto savedDto = ingredientService.save(dto);
+        IngredientDto savedDto = ingredientService.save(dto).block();
         return format("redirect:/recipe/%s/ingredients/%s", dto.getRecipeId(), savedDto.getId());
     }
 
@@ -55,7 +55,7 @@ public class IngredientController {
     public String create(@PathVariable String recipeId, Model model) {
         final IngredientDto dtoWithRecipeId = IngredientDto.builder().recipeId(recipeId).build();
         model.addAttribute("ingredient", dtoWithRecipeId);
-        model.addAttribute("uomList", unitOfMeasureService.findAll());
+        model.addAttribute("uomList", unitOfMeasureService.findAll().collectList().block());
         return "ingredients/form";
     }
 

@@ -1,9 +1,5 @@
 package com.km.converter;
 
-import com.km.converter.CategoryEntityToDtoConverter;
-import com.km.converter.IngredientEntityToDtoConverter;
-import com.km.converter.NoteEntityToDtoConverter;
-import com.km.converter.RecipeEntityToDtoConverter;
 import com.km.dto.CategoryDto;
 import com.km.dto.IngredientDto;
 import com.km.dto.NoteDto;

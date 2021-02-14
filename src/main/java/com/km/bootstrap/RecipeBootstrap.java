@@ -1,11 +1,21 @@
 package com.km.bootstrap;
 
-import com.km.model.*;
+import com.km.model.Category;
+import com.km.model.Difficulty;
+import com.km.model.Ingredient;
+import com.km.model.Note;
+import com.km.model.Recipe;
+import com.km.model.UnitOfMeasure;
 import com.km.repository.CategoryRepository;
 import com.km.repository.IngredientRepository;
 import com.km.repository.RecipeRepository;
 import com.km.repository.UnitOfMeasureRepository;
+import com.km.repository.reactive.CategoryReactiveRepository;
+import com.km.repository.reactive.IngredientReactiveRepository;
+import com.km.repository.reactive.RecipeReactiveRepository;
+import com.km.repository.reactive.UnitOfMeasureReactiveRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -25,12 +35,32 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
     private final UnitOfMeasureRepository unitOfMeasureRepository;
     private final IngredientRepository ingredientRepository;
 
+    @Autowired
+    private UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
+
+    @Autowired
+    private CategoryReactiveRepository categoryReactiveRepository;
+
+    @Autowired
+    private RecipeReactiveRepository recipeReactiveRepository;
+
+    @Autowired
+    private IngredientReactiveRepository ingredientReactiveRepository;
+
     public RecipeBootstrap(CategoryRepository categoryRepository, RecipeRepository recipeRepository,
-                           UnitOfMeasureRepository unitOfMeasureRepository, IngredientRepository ingredientRepository) {
+                           UnitOfMeasureRepository unitOfMeasureRepository, IngredientRepository ingredientRepository,
+                           UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository,
+                           CategoryReactiveRepository categoryReactiveRepository,
+                           RecipeReactiveRepository recipeReactiveRepository,
+                           IngredientReactiveRepository ingredientReactiveRepository) {
         this.categoryRepository = categoryRepository;
         this.recipeRepository = recipeRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
         this.ingredientRepository = ingredientRepository;
+        this.unitOfMeasureReactiveRepository = unitOfMeasureReactiveRepository;
+        this.categoryReactiveRepository = categoryReactiveRepository;
+        this.recipeReactiveRepository = recipeReactiveRepository;
+        this.ingredientReactiveRepository = ingredientReactiveRepository;
     }
 
     @Override
@@ -40,7 +70,7 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         loadUom();
         loadIngredients();
         recipeRepository.saveAll(getRecipes());
-        log.debug("Loading bootstrap data");
+        log.info("Loading bootstrap data");
     }
 
     private void loadCategories() {
@@ -264,6 +294,7 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
     }
 
     private void addIngredientByDescription(Recipe recipe, String description) {
-        ingredientRepository.findByDescription(description).ifPresent(ingredient -> recipe.addIngredient(ingredient));
+        ingredientReactiveRepository.findByDescription(description)
+                .map(ingredient -> recipe.addIngredient(ingredient)).block();
     }
 }

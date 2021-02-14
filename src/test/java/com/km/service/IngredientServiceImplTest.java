@@ -4,15 +4,17 @@ import com.km.converter.IngredientDtoToEntityConverter;
 import com.km.converter.IngredientEntityToDtoConverter;
 import com.km.dto.IngredientDto;
 import com.km.model.Ingredient;
-import com.km.repository.IngredientRepository;
-import com.km.service.IngredientServiceImpl;
+import com.km.model.Recipe;
+import com.km.repository.reactive.IngredientReactiveRepository;
+import com.km.repository.reactive.RecipeReactiveRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,13 +29,16 @@ class IngredientServiceImplTest {
     private static final String ONE = "1", TWO = "2";
 
     @Mock
-    private IngredientRepository ingredientRepository;
+    private IngredientReactiveRepository ingredientReactiveRepository;
 
     @Mock
     private IngredientEntityToDtoConverter toDtoConverter;
 
     @Mock
     private IngredientDtoToEntityConverter toEntityConverter;
+
+    @Mock
+    private RecipeReactiveRepository recipeReactiveRepository;
 
     private IngredientServiceImpl ingredientService;
 
@@ -42,7 +47,7 @@ class IngredientServiceImplTest {
         MockitoAnnotations.initMocks(this);
 
         ingredientService = new IngredientServiceImpl(
-                ingredientRepository, toDtoConverter, toEntityConverter
+                ingredientReactiveRepository, toDtoConverter, toEntityConverter, recipeReactiveRepository
         );
     }
 
@@ -51,28 +56,29 @@ class IngredientServiceImplTest {
         Set<Ingredient> ingredients = new HashSet<>();
         ingredients.add(getIngredientEntity(ONE));
         ingredients.add(getIngredientEntity(TWO));
+        Recipe recipe = Recipe.builder()
+                .id(ONE)
+                .ingredients(ingredients)
+                .build();
 
-        when(ingredientRepository.findAllByRecipeId(anyString())).thenReturn(ingredients);
+        when(recipeReactiveRepository.findById(anyString())).thenReturn(Mono.just(recipe));
         when(toDtoConverter.convert(any())).thenReturn(getIngredientDto(ONE), getIngredientDto(TWO));
 
-        Set<IngredientDto> result = ingredientService.findAllByRecipeId(ONE);
+        Flux<IngredientDto> result = ingredientService.findAllByRecipeId(ONE);
 
-        verify(ingredientRepository).findAllByRecipeId(anyString());
-        verify(toDtoConverter, times(ingredients.size())).convert(any());
-        assertEquals(2, result.size());
+        assertEquals(2, result.count().block().longValue());
     }
 
     @Test
     void findByRecipeIdAndId() {
-        when(ingredientRepository.findByRecipeIdAndId(anyString(), any()))
-                .thenReturn(Optional.of(getIngredientEntity(ONE)));
+        when(ingredientReactiveRepository.findByRecipeIdAndId(anyString(), any()))
+                .thenReturn(Mono.just((getIngredientEntity(ONE))));
         when(toDtoConverter.convert(any())).thenReturn(getIngredientDto(ONE));
 
-        IngredientDto result = ingredientService.findByRecipeIdAndIngredientId(ONE, ONE);
+        Mono<IngredientDto> result = ingredientService.findByRecipeIdAndIngredientId(ONE, ONE);
 
-        verify(ingredientRepository).findByRecipeIdAndId(anyString(), anyString());
-        verify(toDtoConverter).convert(any());
-        assertEquals(ONE, result.getId());
+        verify(ingredientReactiveRepository).findByRecipeIdAndId(anyString(), anyString());
+        assertEquals(ONE, result.block().getId());
     }
 
     private Ingredient getIngredientEntity(String id) {
@@ -86,18 +92,23 @@ class IngredientServiceImplTest {
     @Test
     void save() {
         final IngredientDto dto = getIngredientDto(ONE);
+        Ingredient entity = getIngredientEntity(ONE);
+        when(toEntityConverter.convert(any())).thenReturn(entity);
+        when(ingredientReactiveRepository.save(any())).thenReturn(Mono.just(entity));
+        when(toDtoConverter.convert(any())).thenReturn(dto);
 
         ingredientService.save(dto);
 
         verify(toEntityConverter).convert(any());
-        verify(ingredientRepository).save(any());
-        verify(toDtoConverter).convert(any());
+        verify(ingredientReactiveRepository).save(any());
     }
 
     @Test
     void deleteById() {
+        when(ingredientReactiveRepository.deleteById(anyString())).thenReturn(Mono.empty());
+
         ingredientService.deleteById(ONE);
 
-        verify(ingredientRepository).deleteById(anyString());
+        verify(ingredientReactiveRepository, times(1)).deleteById(anyString());
     }
 }

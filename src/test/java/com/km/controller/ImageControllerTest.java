@@ -15,6 +15,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -52,7 +53,7 @@ class ImageControllerTest {
     @SneakyThrows
     @Test
     void getImageForm() {
-        when(imageService.findById(anyString())).thenReturn(RecipeDto.builder().id(ONE).build());
+        when(imageService.findById(anyString())).thenReturn(Mono.just(RecipeDto.builder().id(ONE).build()));
 
         mockMvc.perform(MockMvcRequestBuilders.get(TestUtils.buildUrl("recipe/", ONE, "/image-upload")))
                 .andExpect(status().isOk())
@@ -82,7 +83,7 @@ class ImageControllerTest {
         String text = "Fetching image from database";
         final byte[] bytes = text.getBytes();
         final InputStream inputStream = new ByteArrayInputStream(bytes);
-        when(imageService.getImageInputStream(anyString())).thenReturn(inputStream);
+        when(imageService.getImageInputStream(anyString())).thenReturn(Mono.just(inputStream));
 
         final MockHttpServletResponse response =
                 mockMvc.perform(get(TestUtils.buildUrl("recipe/", ONE, "/image")))

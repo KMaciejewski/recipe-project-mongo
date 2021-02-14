@@ -2,27 +2,21 @@ package com.km.service;
 
 import com.km.converter.UomEntityToDtoConverter;
 import com.km.dto.UnitOfMeasureDto;
-import com.km.repository.UnitOfMeasureRepository;
+import com.km.repository.reactive.UnitOfMeasureReactiveRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
-import java.util.stream.StreamSupport;
-
-import static java.util.stream.Collectors.toSet;
+import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
 public class UnitOfMeasureServiceImpl implements UnitOfMeasureService {
 
-    private final UnitOfMeasureRepository unitOfMeasureRepository;
+    private final UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
     private final UomEntityToDtoConverter toDtoConverter;
 
     @Override
-    public Set<UnitOfMeasureDto> findAll() {
-        return StreamSupport.stream(unitOfMeasureRepository.findAll()
-                .spliterator(), false)
-                .map(toDtoConverter::convert)
-                .collect(toSet());
+    public Flux<UnitOfMeasureDto> findAll() {
+        return unitOfMeasureReactiveRepository.findAll()
+                .map(toDtoConverter::convert);
     }
 }

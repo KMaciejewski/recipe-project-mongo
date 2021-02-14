@@ -2,6 +2,10 @@ package com.km.repository;
 
 import com.km.bootstrap.RecipeBootstrap;
 import com.km.model.UnitOfMeasure;
+import com.km.repository.reactive.CategoryReactiveRepository;
+import com.km.repository.reactive.IngredientReactiveRepository;
+import com.km.repository.reactive.RecipeReactiveRepository;
+import com.km.repository.reactive.UnitOfMeasureReactiveRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +33,18 @@ class UnitOfMeasureRepositoryIT {
     @Autowired
     private IngredientRepository ingredientRepository;
 
+    @Autowired
+    private UnitOfMeasureReactiveRepository unitOfMeasureReactiveRepository;
+
+    @Autowired
+    private CategoryReactiveRepository categoryReactiveRepository;
+
+    @Autowired
+    private RecipeReactiveRepository recipeReactiveRepository;
+
+    @Autowired
+    private IngredientReactiveRepository ingredientReactiveRepository;
+
     private RecipeBootstrap recipeBootstrap;
 
     @BeforeEach
@@ -37,7 +53,7 @@ class UnitOfMeasureRepositoryIT {
         unitOfMeasureRepository.deleteAll();
         categoryRepository.deleteAll();
 
-        recipeBootstrap = new RecipeBootstrap(categoryRepository, recipeRepository, unitOfMeasureRepository, ingredientRepository);
+        recipeBootstrap = new RecipeBootstrap(categoryRepository, recipeRepository, unitOfMeasureRepository, ingredientRepository, unitOfMeasureReactiveRepository, categoryReactiveRepository, recipeReactiveRepository, ingredientReactiveRepository);
         recipeBootstrap.onApplicationEvent(null);
     }
 

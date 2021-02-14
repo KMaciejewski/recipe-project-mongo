@@ -4,6 +4,7 @@ import com.km.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +38,7 @@ class CategoryTest {
 
     @Test
     void getRecipes() {
-        Set<Recipe> recipes = TestUtils.getRecipes(Recipe.class);
+        Set<Recipe> recipes = new HashSet<>(TestUtils.getRecipes(Recipe.class));
 
         category.setRecipes(recipes);
 

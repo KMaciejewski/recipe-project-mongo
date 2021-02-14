@@ -1,6 +1,5 @@
 package com.km.converter;
 
-import com.km.converter.NoteDtoToEntityConverter;
 import com.km.dto.NoteDto;
 import com.km.model.Note;
 import org.junit.jupiter.api.BeforeEach;

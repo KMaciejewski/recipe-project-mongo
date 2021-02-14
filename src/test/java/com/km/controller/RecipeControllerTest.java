@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,12 +49,12 @@ class RecipeControllerTest {
     @SneakyThrows
     @Test
     void showById() {
-        when(recipeService.findById(ID)).thenReturn(TestUtils.getById(RecipeDto.class, ID));
+        when(recipeService.findById(ID)).thenReturn(Mono.just(TestUtils.getById(RecipeDto.class, ID)));
 
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ID))
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipes/show"))
-                .andExpect(model().attribute("recipe", recipeService.findById(ID)));
+                .andExpect(model().attribute("recipe", recipeService.findById(ID).block()));
     }
 
     @SneakyThrows
@@ -91,7 +92,7 @@ class RecipeControllerTest {
     @Test
     void update() {
         final RecipeDto dto = TestUtils.getById(RecipeDto.class, ID);
-        when(recipeService.findById(ID)).thenReturn(dto);
+        when(recipeService.findById(ID)).thenReturn(Mono.just(dto));
 
         mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + ID + "/update"))
                 .andExpect(status().isOk())
@@ -103,7 +104,7 @@ class RecipeControllerTest {
     @Test
     void saveOrUpdate() {
         RecipeDto dto = RecipeDto.builder().id("1").build();
-        when(recipeService.save(any())).thenReturn(dto);
+        when(recipeService.save(any())).thenReturn(Mono.just(dto));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post(BASE_URL)

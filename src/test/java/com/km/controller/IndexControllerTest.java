@@ -12,8 +12,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import reactor.core.publisher.Flux;
 
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -28,7 +29,7 @@ class IndexControllerTest {
     @Mock
     private Model model;
 
-    private Set<RecipeDto> recipes;
+    private List<RecipeDto> recipes;
 
     @BeforeEach
     void setUp() {
@@ -38,7 +39,7 @@ class IndexControllerTest {
 
         recipes = TestUtils.getRecipes(RecipeDto.class);
 
-        Mockito.when(recipeService.findAll()).thenReturn(recipes);
+        Mockito.when(recipeService.findAll()).thenReturn(Flux.fromIterable(recipes));
     }
 
     @Test

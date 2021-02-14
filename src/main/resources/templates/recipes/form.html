@@ -5,13 +5,17 @@
     <title>Recipe</title>
 
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 
     <!-- Optional theme -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
+          integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
 
     <!-- Latest compiled and minified JavaScript -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+            integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+            crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="container-fluid" style="margin-top: 20px">
@@ -100,7 +104,8 @@
                                 <div class="col-md-3 form-group" th:class="${#fields.hasErrors('servings')}
                                 ? 'col-,d-3 form-group has-error' : 'col-md-3 form-group'">
                                     <label>Servings:
-                                        <input type="text" class="form-control" th:field="*{servings}" th:errorClass="has-error"/>
+                                        <input type="text" class="form-control" th:field="*{servings}"
+                                               th:errorClass="has-error"/>
                                         <span class="help-block" th:if="${#fields.hasErrors('servings')}">
                                             <ul>
                                                 <li th:each="error : ${#fields.errors('servings')}"
@@ -117,7 +122,8 @@
                                 <div class="col-md-3 form-group" th:class="${#fields.hasErrors('url')}
                                 ? 'col-,d-3 form-group has-error' : 'col-md-3 form-group'">
                                     <label>URL:
-                                        <input type="text" class="form-control" th:field="*{url}" th:if="${#fields.hasErrors('url')}"/>
+                                        <input type="text" class="form-control" th:field="*{url}"
+                                               th:if="${#fields.hasErrors('url')}"/>
                                         <span class="help-block" th:if="${#fields.hasErrors('url')}">
                                             <ul>
                                                 <li th:each="error : ${#fields.errors('url')}"

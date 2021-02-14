@@ -13,9 +13,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.String.format;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,10 +57,9 @@ public class IngredientControllerTest {
     @SneakyThrows
     @Test
     void findAllByRecipeId() {
-        Set<IngredientDto> ingredients = new HashSet<>();
-        ingredients.add(IngredientDto.builder().id(ONE).build());
-        ingredients.add(IngredientDto.builder().id(TWO).build());
-        when(ingredientService.findAllByRecipeId(anyString())).thenReturn(ingredients);
+        IngredientDto first = IngredientDto.builder().id(ONE).build();
+        IngredientDto second = IngredientDto.builder().id(TWO).build();
+        when(ingredientService.findAllByRecipeId(anyString())).thenReturn(Flux.just(first, second));
 
         mockMvc.perform(MockMvcRequestBuilders.get(TestUtils.buildUrl(RECIPE, ONE, INGREDIENTS)))
                 .andExpect(status().isOk())
@@ -70,7 +71,7 @@ public class IngredientControllerTest {
     @Test
     void findRecipeIngredient() {
         final IngredientDto dto = IngredientDto.builder().id(ONE).build();
-        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(dto);
+        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(Mono.just(dto));
 
         mockMvc.perform(MockMvcRequestBuilders.get(TestUtils.buildUrl(RECIPE, ONE, INGREDIENTS, ONE)))
                 .andExpect(status().isOk())
@@ -82,9 +83,9 @@ public class IngredientControllerTest {
     @Test
     void update() {
         IngredientDto dto = IngredientDto.builder().id(ONE).recipeId(ONE).build();
-        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(dto);
+        when(ingredientService.findByRecipeIdAndIngredientId(anyString(), anyString())).thenReturn(Mono.just(dto));
 
-        Set<UnitOfMeasureDto> unitOfMeasureDtos = getUnitOfMeasureDtos();
+        List<UnitOfMeasureDto> unitOfMeasureDtos = getUnitOfMeasureDtos();
 
         mockMvc.perform(MockMvcRequestBuilders.get(TestUtils.buildUrl(RECIPE, ONE, INGREDIENTS, ONE, "update")))
                 .andExpect(status().isOk())
@@ -93,12 +94,15 @@ public class IngredientControllerTest {
                 .andExpect(model().attribute("uomList", unitOfMeasureDtos));
     }
 
-    private Set<UnitOfMeasureDto> getUnitOfMeasureDtos() {
-        Set<UnitOfMeasureDto> unitOfMeasureDtos = new HashSet<>();
-        unitOfMeasureDtos.add(UnitOfMeasureDto.builder().id(ONE).description("Teaspoon").build());
-        unitOfMeasureDtos.add(UnitOfMeasureDto.builder().id(ONE).description("Tablespoon").build());
-        unitOfMeasureDtos.add(UnitOfMeasureDto.builder().id(ONE).description("Cup").build());
-        when(unitOfMeasureService.findAll()).thenReturn(unitOfMeasureDtos);
+    private List<UnitOfMeasureDto> getUnitOfMeasureDtos() {
+        List<UnitOfMeasureDto> unitOfMeasureDtos = new ArrayList<>();
+        UnitOfMeasureDto teaspoon = UnitOfMeasureDto.builder().id(ONE).description("Teaspoon").build();
+        unitOfMeasureDtos.add(teaspoon);
+        UnitOfMeasureDto tablespoon = UnitOfMeasureDto.builder().id(ONE).description("Tablespoon").build();
+        unitOfMeasureDtos.add(tablespoon);
+        UnitOfMeasureDto cup = UnitOfMeasureDto.builder().id(ONE).description("Cup").build();
+        unitOfMeasureDtos.add(cup);
+        when(unitOfMeasureService.findAll()).thenReturn(Flux.just(teaspoon, tablespoon, cup));
         return unitOfMeasureDtos;
     }
 
@@ -106,7 +110,7 @@ public class IngredientControllerTest {
     @Test
     void saveOrUpdate() {
         final IngredientDto dto = IngredientDto.builder().id(ONE).build();
-        when(ingredientService.save(any())).thenReturn(dto);
+        when(ingredientService.save(any())).thenReturn(Mono.just(dto));
 
         mockMvc.perform(MockMvcRequestBuilders.post(TestUtils.buildUrl(RECIPE, ONE, INGREDIENTS)))
                 .andExpect(status().is3xxRedirection())
@@ -117,7 +121,7 @@ public class IngredientControllerTest {
     @Test
     void create() {
         final IngredientDto dtoWithRecipeId = IngredientDto.builder().recipeId(ONE).build();
-        Set<UnitOfMeasureDto> unitOfMeasureDtos = getUnitOfMeasureDtos();
+        List<UnitOfMeasureDto> unitOfMeasureDtos = getUnitOfMeasureDtos();
 
         mockMvc.perform(MockMvcRequestBuilders.get(TestUtils.buildUrl(RECIPE, ONE, INGREDIENTS, "new")))
                 .andExpect(status().isOk())

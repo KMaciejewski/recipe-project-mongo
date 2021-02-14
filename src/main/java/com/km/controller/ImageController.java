@@ -36,6 +36,6 @@ public class ImageController {
     @GetMapping("recipe/{id}/image")
     public void getImageFromDB(@PathVariable String id, HttpServletResponse response) {
         response.setContentType("image/jpeg");
-        IOUtils.copy(imageService.getImageInputStream(id), response.getOutputStream());
+        IOUtils.copy(imageService.getImageInputStream(id).block(), response.getOutputStream());
     }
 }

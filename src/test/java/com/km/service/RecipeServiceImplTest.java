@@ -3,23 +3,23 @@ package com.km.service;
 import com.km.converter.RecipeDtoToEntityConverter;
 import com.km.converter.RecipeEntityToDtoConverter;
 import com.km.dto.RecipeDto;
-import com.km.exception.NotFoundException;
 import com.km.model.Recipe;
-import com.km.repository.RecipeRepository;
+import com.km.repository.reactive.RecipeReactiveRepository;
 import com.km.utils.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +28,7 @@ class RecipeServiceImplTest {
     private RecipeService recipeService;
 
     @Mock
-    private RecipeRepository recipeRepository;
+    private RecipeReactiveRepository recipeReactiveRepository;
 
     @Mock
     private RecipeDtoToEntityConverter toEntityConverter;
@@ -36,20 +36,20 @@ class RecipeServiceImplTest {
     @Mock
     private RecipeEntityToDtoConverter toDtoConverter;
 
-    private Set<Recipe> entities;
-    private Set<RecipeDto> dtos;
+    private List<Recipe> entities;
+    private List<RecipeDto> dtos;
     private final String ID = "1";
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        recipeService = new RecipeServiceImpl(recipeRepository, toEntityConverter, toDtoConverter);
+        recipeService = new RecipeServiceImpl(recipeReactiveRepository, toEntityConverter, toDtoConverter);
 
         entities = TestUtils.getRecipes(Recipe.class);
         dtos = TestUtils.getRecipes(RecipeDto.class);
 
-        when(recipeRepository.findAll()).thenReturn(entities);
+        when(recipeReactiveRepository.findAll()).thenReturn(Flux.fromIterable(entities));
     }
 
     @Test
@@ -62,28 +62,22 @@ class RecipeServiceImplTest {
                 TestUtils.getById(RecipeDto.class, "5")
         );
 
-        Set<RecipeDto> result = recipeService.findAll();
+        Flux<RecipeDto> result = recipeService.findAll();
 
-        assertEquals(dtos, result);
-        Mockito.verify(recipeRepository, Mockito.times(1)).findAll();
+        assertEquals(dtos, result.collectList().block());
+        Mockito.verify(recipeReactiveRepository, Mockito.times(1)).findAll();
         Mockito.verify(toDtoConverter, Mockito.times(dtos.size())).convert(any());
     }
 
     @Test
     void findById() {
         final Recipe recipe = TestUtils.getById(Recipe.class, ID);
-        when(recipeRepository.findById(ID)).thenReturn(Optional.of(recipe));
+        when(recipeReactiveRepository.findById(ID)).thenReturn(Mono.just(recipe));
         when(toDtoConverter.convert(recipe)).thenReturn(TestUtils.getById(RecipeDto.class, ID));
 
-        RecipeDto result = recipeService.findById(ID);
+        Mono<RecipeDto> result = recipeService.findById(ID);
 
-        assertEquals(ID, result.getId());
-    }
-
-    @Test
-    void findByIdNotFound() {
-        assertThrows(NotFoundException.class,
-                () -> recipeService.findById(anyString()), "Entity not found");
+        assertEquals(ID, result.block().getId());
     }
 
     @Test
@@ -92,20 +86,21 @@ class RecipeServiceImplTest {
         RecipeDto dto = RecipeDto.builder().id("1").build();
 
         when(toEntityConverter.convert(dto)).thenReturn(entity);
-        when(recipeRepository.save(entity)).thenReturn(entity);
+        when(recipeReactiveRepository.save(entity)).thenReturn(Mono.just(entity));
         when(toDtoConverter.convert(entity)).thenReturn(dto);
 
         recipeService.save(dto);
 
         verify(toEntityConverter).convert(dto);
-        verify(recipeRepository).save(entity);
-        verify(toDtoConverter).convert(entity);
+        verify(recipeReactiveRepository).save(entity);
     }
 
     @Test
     void deleteById() {
+        when(recipeReactiveRepository.deleteById(anyString())).thenReturn(Mono.empty());
+
         recipeService.deleteById(ID);
 
-        verify(recipeRepository).deleteById(anyString());
+        verify(recipeReactiveRepository, times(1)).deleteById(anyString());
     }
 }

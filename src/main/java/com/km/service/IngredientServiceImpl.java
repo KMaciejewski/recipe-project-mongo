@@ -4,45 +4,45 @@ import com.km.converter.IngredientDtoToEntityConverter;
 import com.km.converter.IngredientEntityToDtoConverter;
 import com.km.dto.IngredientDto;
 import com.km.model.Ingredient;
-import com.km.repository.IngredientRepository;
+import com.km.repository.reactive.IngredientReactiveRepository;
+import com.km.repository.reactive.RecipeReactiveRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
-
-import static java.util.stream.Collectors.toSet;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class IngredientServiceImpl implements IngredientService {
 
-    private final IngredientRepository ingredientRepository;
+    private final IngredientReactiveRepository ingredientReactiveRepository;
     private final IngredientEntityToDtoConverter toDtoConverter;
     private final IngredientDtoToEntityConverter toEntityConverter;
+    private final RecipeReactiveRepository recipeReactiveRepository;
 
     @Override
-    public Set<IngredientDto> findAllByRecipeId(String recipeId) {
-        return ingredientRepository.findAllByRecipeId(recipeId)
-                .stream()
-                .map(toDtoConverter::convert)
-                .collect(toSet());
+    public Flux<IngredientDto> findAllByRecipeId(String recipeId) {
+        return Flux.fromIterable(
+                recipeReactiveRepository.findById(recipeId)
+                        .block()
+                        .getIngredients())
+                .map(toDtoConverter::convert);
     }
 
     @Override
-    public IngredientDto findByRecipeIdAndIngredientId(String recipeId, String ingredientId) {
-        return ingredientRepository.findByRecipeIdAndId(recipeId, ingredientId)
-                .map(toDtoConverter::convert)
-                .orElse(null);
+    public Mono<IngredientDto> findByRecipeIdAndIngredientId(String recipeId, String ingredientId) {
+        return ingredientReactiveRepository.findByRecipeIdAndId(recipeId, ingredientId)
+                .map(toDtoConverter::convert);
     }
 
     @Override
-    public IngredientDto save(IngredientDto dto) {
-        Ingredient savedEntity = ingredientRepository.save(toEntityConverter.convert(dto));
-        return toDtoConverter.convert(savedEntity);
+    public Mono<IngredientDto> save(IngredientDto dto) {
+        return ingredientReactiveRepository.save(toEntityConverter.convert(dto))
+                .map(toDtoConverter::convert);
     }
 
     @Override
     public void deleteById(String ingredientId) {
-        ingredientRepository.deleteById(ingredientId);
+        ingredientReactiveRepository.deleteById(ingredientId).block();
     }
 }

@@ -1,16 +1,16 @@
 package com.km.service;
 
 import com.km.dto.IngredientDto;
-
-import java.util.Set;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public interface IngredientService {
 
-    Set<IngredientDto> findAllByRecipeId(String recipeId);
+    Flux<IngredientDto> findAllByRecipeId(String recipeId);
 
-    IngredientDto findByRecipeIdAndIngredientId(String recipeId, String ingredientId);
+    Mono<IngredientDto> findByRecipeIdAndIngredientId(String recipeId, String ingredientId);
 
-    IngredientDto save(IngredientDto dto);
+    Mono<IngredientDto> save(IngredientDto dto);
 
     void deleteById(String ingredientId);
 }

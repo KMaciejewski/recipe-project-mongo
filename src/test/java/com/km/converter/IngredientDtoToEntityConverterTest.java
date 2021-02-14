@@ -1,7 +1,5 @@
 package com.km.converter;
 
-import com.km.converter.IngredientDtoToEntityConverter;
-import com.km.converter.UomDtoToEntityConverter;
 import com.km.dto.IngredientDto;
 import com.km.dto.UnitOfMeasureDto;
 import com.km.model.Ingredient;

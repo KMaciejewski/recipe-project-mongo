@@ -2,14 +2,13 @@ package com.km.service;
 
 import com.km.converter.RecipeEntityToDtoConverter;
 import com.km.dto.RecipeDto;
-import com.km.exception.NotFoundException;
 import com.km.model.Recipe;
-import com.km.repository.RecipeRepository;
+import com.km.repository.reactive.RecipeReactiveRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -18,12 +17,11 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
 
-    private final RecipeRepository recipeRepository;
+    private final RecipeReactiveRepository recipeReactiveRepository;
     private final RecipeEntityToDtoConverter toDtoConverter;
 
     @SneakyThrows
     @Override
-    @Transactional
     public void save(String id, MultipartFile image) {
         final Byte[] bytes = new Byte[image.getBytes().length];
         int i = 0;
@@ -31,17 +29,17 @@ public class ImageServiceImpl implements ImageService {
             bytes[i++] = b;
         }
 
-        findEntityById(id).setImage(bytes);
+        findEntityById(id).block().setImage(bytes);
     }
 
     @Override
-    public RecipeDto findById(String id) {
-        return toDtoConverter.convert(findEntityById(id));
+    public Mono<RecipeDto> findById(String id) {
+        return findEntityById(id).map(toDtoConverter::convert);
     }
 
     @Override
-    public InputStream getImageInputStream(String id) {
-        final Recipe recipe = findEntityById(id);
+    public Mono<InputStream> getImageInputStream(String id) {
+        final Recipe recipe = findEntityById(id).block();
 
         if (recipe.getImage() != null) {
             final byte[] bytes = new byte[recipe.getImage().length];
@@ -49,13 +47,12 @@ public class ImageServiceImpl implements ImageService {
             for (Byte b : recipe.getImage()) {
                 bytes[i++] = b;
             }
-            return new ByteArrayInputStream(bytes);
+            return Mono.just(new ByteArrayInputStream(bytes));
         }
-        return new ByteArrayInputStream(new byte[0]);
+        return Mono.just(new ByteArrayInputStream(new byte[0]));
     }
 
-    private Recipe findEntityById(String id) {
-        return recipeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Entity not found"));
+    private Mono<Recipe> findEntityById(String id) {
+        return recipeReactiveRepository.findById(id);
     }
 }

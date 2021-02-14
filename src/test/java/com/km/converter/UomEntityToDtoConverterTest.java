@@ -1,6 +1,5 @@
 package com.km.converter;
 
-import com.km.converter.UomEntityToDtoConverter;
 import com.km.dto.UnitOfMeasureDto;
 import com.km.model.UnitOfMeasure;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,5 @@
 package com.km.converter;
 
-import com.km.converter.CategoryEntityToDtoConverter;
 import com.km.dto.CategoryDto;
 import com.km.model.Category;
 import org.junit.jupiter.api.BeforeEach;

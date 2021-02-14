@@ -5,9 +5,9 @@ import com.km.exception.NotFoundException;
 import com.km.model.Recipe;
 import lombok.SneakyThrows;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
@@ -22,10 +22,10 @@ public class TestUtils {
 
     @SuppressWarnings("unchecked")
     @SneakyThrows
-    public static <T> Set<T> getRecipes(Class<T> clazz) {
+    public static <T> List<T> getRecipes(Class<T> clazz) {
         final long amount = 5L;
         final T instance = clazz.newInstance();
-        Set<T> recipes = new HashSet<>();
+        List<T> recipes = new ArrayList<>();
         LongStream.rangeClosed(1, amount)
                 .forEach(value -> {
                             if (instance instanceof Recipe) {
